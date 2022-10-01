@@ -1,6 +1,10 @@
 import { useState } from 'react';
-import Section from './Section/';
+
 import Container from './Container/Container.styled';
+import FeedbackOptions from 'components/FeedbackOptions';
+import Statictics from 'components/Statistics';
+import Notification from 'components/Notification';
+import Title from './Title';
 
 export function App() {
   const [good, setGood] = useState(0);
@@ -23,14 +27,28 @@ export function App() {
         return;
     }
   };
+  const countTotalFeedback = ({ good, neutral, bad }) => good + neutral + bad;
+  const countPositiveFeedbackPercentage = ({ good, bad }) => {
+    return (good / (good + bad)) * 100 || 0;
+  };
 
   return (
     <Container>
-      <Section
-        title="Please leave feedback"
-        onLeaveFeedback={upValue}
-        options={feedback}
-      />
+      <Title>Please leave feedback</Title>
+      <FeedbackOptions options={feedback} onLeaveFeedback={upValue} />
+      {countTotalFeedback(feedback) > 0 ? (
+        <Statictics
+          good={feedback.good}
+          neutral={feedback.neutral}
+          bad={feedback.bad}
+          total={countTotalFeedback(feedback)}
+          positivePercentage={countPositiveFeedbackPercentage(feedback).toFixed(
+            0
+          )}
+        />
+      ) : (
+        <Notification message="There is no feedback" />
+      )}
     </Container>
   );
 }
